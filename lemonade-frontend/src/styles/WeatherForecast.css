@@ -1,0 +1,107 @@
+.weather-forecast {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 20px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.weather-forecast h3 {
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-size: 1.3em;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.forecast-day {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 12px 8px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.forecast-day:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.forecast-day.heatwave {
+  background: linear-gradient(135deg, rgba(255, 87, 34, 0.4) 0%, rgba(255, 152, 0, 0.4) 100%);
+  border: 2px solid #ff9800;
+  box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
+}
+
+.forecast-day-label {
+  font-size: 0.85em;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.forecast-icon {
+  font-size: 2.5em;
+  margin: 8px 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.forecast-temp {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin: 8px 0;
+  color: #fff;
+}
+
+.forecast-weather {
+  font-size: 0.85em;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 4px;
+}
+
+.forecast-alert {
+  background: rgba(255, 87, 34, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: bold;
+  margin-top: 8px;
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+@keyframes alertPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .forecast-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .forecast-icon {
+    font-size: 2em;
+  }
+
+  .forecast-temp {
+    font-size: 1.1em;
+  }
+}

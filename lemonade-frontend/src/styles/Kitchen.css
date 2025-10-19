@@ -1,0 +1,757 @@
+.kitchen-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  padding: 20px;
+}
+
+.kitchen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.kitchen-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.btn-back {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: white;
+  color: #11998e;
+  transform: translateY(-2px);
+}
+
+.kitchen-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 500px;
+  gap: 20px;
+}
+
+/* Mixer Panel */
+.mixer-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mixer-panel h2 {
+  margin: 0 0 24px 0;
+  color: #333;
+  font-size: 1.8rem;
+  border-bottom: 3px solid #11998e;
+  padding-bottom: 12px;
+}
+
+.ingredient-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.ingredient-section h3 {
+  margin: 0 0 16px 0;
+  color: #11998e;
+  font-size: 1.3rem;
+}
+
+.ingredient-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ingredient-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ingredient-item label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.ingredient-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ingredient-controls button {
+  padding: 8px 16px;
+  background: #11998e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 45px;
+}
+
+.ingredient-controls button:hover:not(:disabled) {
+  background: #0d7a6f;
+  transform: scale(1.05);
+}
+
+.ingredient-controls button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ingredient-controls .btn-bulk-adjust {
+  background: #38ef7d;
+  color: #333;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  min-width: 60px;
+}
+
+.ingredient-controls .btn-bulk-adjust:hover:not(:disabled) {
+  background: #2dd96a;
+}
+
+.ingredient-controls .quantity {
+  min-width: 80px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 2px solid #e9ecef;
+}
+
+.ingredient-info {
+  margin: 8px 0 0 0;
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Container Selection */
+.container-selection {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.container-btn {
+  padding: 16px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.container-btn:hover:not(:disabled) {
+  border-color: #11998e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(17, 153, 142, 0.2);
+}
+
+.container-btn.selected {
+  border-color: #11998e;
+  background: #e6f9f7;
+  font-weight: bold;
+}
+
+.container-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.container-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.container-info {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Mix Preview */
+.mix-preview {
+  margin-top: 24px;
+  padding: 20px;
+  background: #e6f9f7;
+  border-radius: 8px;
+  border: 2px solid #11998e;
+}
+
+.mix-preview h3 {
+  margin: 0 0 16px 0;
+  color: #11998e;
+  font-size: 1.2rem;
+}
+
+.preview-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #11998e;
+  font-size: 1.1rem;
+}
+
+.stat-value.error {
+  color: #dc3545;
+}
+
+.fill-bar-container {
+  width: 100%;
+  height: 30px;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 2px solid #11998e;
+  margin-bottom: 12px;
+}
+
+.fill-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.fill-bar.overfill {
+  background: linear-gradient(90deg, #dc3545 0%, #ff6b6b 100%);
+}
+
+.error-message {
+  color: #dc3545;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-robot {
+  flex: 0 0 auto;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-robot:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-robot:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-mix {
+  flex: 1;
+  padding: 16px;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-mix:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(17, 153, 142, 0.4);
+}
+
+.btn-mix:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Cider Panel */
+.cider-panel {
+  border: 3px solid #CD853F;
+  background: linear-gradient(135deg, #FFF8DC 0%, #FFEFD5 100%);
+}
+
+.cider-panel h2 {
+  color: #8B4513;
+}
+
+.cider-note {
+  text-align: center;
+  color: #8B4513;
+  font-style: italic;
+  margin: -10px 0 20px 0;
+  font-size: 0.95rem;
+}
+
+.btn-brew-cider {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #CD853F 0%, #8B4513 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: all 0.3s ease;
+}
+
+.btn-brew-cider:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(139, 69, 19, 0.4);
+}
+
+.btn-brew-cider:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.cider-batch-card {
+  border-left: 4px solid #CD853F;
+  background: linear-gradient(135deg, #FFF8DC 0%, #FFFFFF 100%);
+}
+
+.cider-batch-card .batch-quality {
+  background: linear-gradient(135deg, #CD853F 0%, #8B4513 100%);
+  color: white;
+}
+
+/* Batches Panel */
+.batches-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.batches-panel h2 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.5rem;
+  border-bottom: 3px solid #11998e;
+  padding-bottom: 12px;
+  sticky: top 0;
+  background: white;
+  z-index: 1;
+}
+
+.empty-message {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+.batches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.batch-card {
+  padding: 16px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.batch-card:hover {
+  border-color: #11998e;
+  box-shadow: 0 4px 8px rgba(17, 153, 142, 0.2);
+}
+
+.batch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.batch-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.batch-quality {
+  background: #38ef7d;
+  color: #333;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.batch-info {
+  margin-bottom: 12px;
+}
+
+.batch-info p {
+  margin: 4px 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.batch-recipe {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.batch-recipe strong {
+  color: #11998e;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.batch-recipe ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.batch-recipe li {
+  color: #555;
+  font-size: 0.85rem;
+  margin: 4px 0;
+}
+
+.loading {
+  text-align: center;
+  color: white;
+  font-size: 1.5rem;
+  padding: 50px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .kitchen-content {
+    grid-template-columns: 1fr;
+  }
+
+  .batches-panel {
+    max-height: none;
+  }
+}
+
+/* Taster's GuideBook Hints */
+.tasters-hints {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+  border: 2px solid #ffc107;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.tasters-hints h3 {
+  margin: 0 0 10px 0;
+  color: #856404;
+  font-size: 1.1rem;
+}
+
+.hint-perfect {
+  color: #155724;
+  background: #d4edda;
+  padding: 10px;
+  border-radius: 6px;
+  margin: 0;
+  font-weight: 600;
+  border-left: 4px solid #28a745;
+}
+
+.hint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hint-issue {
+  color: #721c24;
+  background: #f8d7da;
+  padding: 10px;
+  border-radius: 6px;
+  margin: 0;
+  font-weight: 600;
+  border-left: 4px solid #dc3545;
+}
+
+/* Container Combining Styles */
+.batches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.batch-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-combine-mode,
+.btn-combine-confirm,
+.btn-combine-cancel {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.btn-combine-mode {
+  background: #667eea;
+  color: white;
+}
+
+.btn-combine-mode:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+}
+
+.btn-combine-confirm {
+  background: #10b981;
+  color: white;
+}
+
+.btn-combine-confirm:hover:not(:disabled) {
+  background: #059669;
+}
+
+.btn-combine-confirm:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.btn-combine-cancel {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-combine-cancel:hover {
+  background: #dc2626;
+}
+
+.combine-instructions {
+  background: #fef3c7;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  color: #92400e;
+  font-size: 0.95rem;
+  border-left: 4px solid #f59e0b;
+}
+
+.batch-card.selectable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.batch-card.selectable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.batch-card.selected {
+  border: 3px solid #667eea;
+  box-shadow: 0 0 12px rgba(102, 126, 234, 0.4);
+}
+
+.batch-card.max-uses {
+  opacity: 0.8;
+  border-left: 4px solid #f59e0b;
+}
+
+.batch-checkbox {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.batch-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.container-uses {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.container-uses.max-uses-warning {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.batch-card {
+  position: relative;
+  padding-left: 20px;
+}
+
+.batch-card.selectable {
+  padding-left: 45px;
+}
+
+@media (max-width: 768px) {
+  .kitchen-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .container-selection {
+    grid-template-columns: 1fr;
+  }
+
+  .ingredient-controls {
+    flex-wrap: wrap;
+  }
+
+  .batches-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .batch-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+/* Batch Actions */
+.batch-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-taste-batch,
+.btn-adjust-batch {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-taste-batch {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  color: #2d3436;
+}
+
+.btn-taste-batch:hover:not(:disabled) {
+  background: linear-gradient(135deg, #fdcb6e 0%, #f9c90c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(253, 203, 110, 0.4);
+}
+
+.btn-adjust-batch {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  color: white;
+}
+
+.btn-adjust-batch:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0984e3 0%, #0770c4 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(9, 132, 227, 0.4);
+}
+
+.btn-taste-batch:disabled,
+.btn-adjust-batch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .batch-actions {
+    flex-direction: column;
+  }
+
+  .btn-taste-batch,
+  .btn-adjust-batch {
+    width: 100%;
+  }
+}
