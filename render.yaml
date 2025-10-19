@@ -37,7 +37,6 @@ services:
     name: lemonade-frontend
     runtime: static
     plan: free
-    region: ohio
     rootDir: lemonade-frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: ./build
