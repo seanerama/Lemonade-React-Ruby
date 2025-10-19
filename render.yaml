@@ -36,7 +36,6 @@ services:
   - type: web
     name: lemonade-frontend
     runtime: static
-    plan: free
     rootDir: lemonade-frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: ./build
