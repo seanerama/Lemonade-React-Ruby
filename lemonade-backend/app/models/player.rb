@@ -6,7 +6,9 @@ class Player < ApplicationRecord
   validates :username, presence: true, uniqueness: true,
             length: { minimum: 3, maximum: 20 },
             format: { with: /\A[a-zA-Z0-9_]+\z/, message: "only allows letters, numbers, and underscores" }
-  validates :email, uniqueness: true, allow_blank: true,
+  validates :email,
+            uniqueness: { allow_blank: true },
+            allow_blank: true,
             format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email" }, if: -> { email.present? }
   validates :name, presence: true
   validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
