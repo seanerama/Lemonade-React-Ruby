@@ -161,7 +161,7 @@ function HomeOffice() {
     // Prompt user for number of days
     const daysInput = window.prompt(
       'How many days would you like to shutdown?\n\n' +
-      'You will earn $5 per day.\n' +
+      'You will earn $2 per day.\n' +
       'Active effects (ad campaigns) will expire.',
       '7'
     );
@@ -175,7 +175,7 @@ function HomeOffice() {
       return;
     }
 
-    const totalEarnings = numDays * 5;
+    const totalEarnings = numDays * 2;
 
     const confirmed = window.confirm(
       `Shutdown for ${numDays} day${numDays > 1 ? 's' : ''}?\n\n` +
@@ -192,7 +192,7 @@ function HomeOffice() {
       setAdvancing(true);
       const newGameData = { ...gameData.game_data };
 
-      // Give player $5 per day
+      // Give player $2 per day
       newGameData.money += totalEarnings;
 
       // Move today's tips to savings first
@@ -292,124 +292,6 @@ function HomeOffice() {
     }
   };
 
-  const handleAdvanceDay = async () => {
-    if (advancing) return;
-
-    const confirmed = window.confirm(
-      'Advance to the next day without selling?\n\n' +
-      'Note: Lemonade batches will age and you won\'t earn any money today.'
-    );
-
-    if (!confirmed) return;
-
-    try {
-      setAdvancing(true);
-      const newGameData = { ...gameData.game_data };
-
-      // Move tip jar to savings and apply interest
-      const tipJar = newGameData.tip_jar || 0;
-      const currentSavings = newGameData.tips_savings || 0;
-      const interest = calculateTipsInterest(currentSavings);
-
-      newGameData.tips_savings = currentSavings + interest + tipJar;
-      newGameData.tip_jar = 0;
-
-      // Advance day
-      newGameData.day_count += 1;
-
-      // Calculate next day of week
-      const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      const currentDayIndex = daysOfWeek.indexOf(newGameData.day_name);
-      newGameData.day_name = daysOfWeek[(currentDayIndex + 1) % 7];
-
-      // Advance calendar day
-      newGameData.day_num += 1;
-      const currentMonth = Math.floor(newGameData.month);
-      const daysInMonth = new Date(2024, currentMonth, 0).getDate();
-
-      if (newGameData.day_num > daysInMonth) {
-        newGameData.day_num = 1;
-        newGameData.month += 1;
-
-        if (newGameData.month > 10) {
-          newGameData.month = 3; // Loop back to March
-        }
-
-        const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June',
-                           'July', 'August', 'September', 'October', 'November', 'December'];
-        newGameData.month_name = monthNames[Math.floor(newGameData.month)];
-      }
-
-      // Update weather from pre-generated data
-      if (!newGameData.weather) newGameData.weather = {};
-      const weatherData = newGameData.weather.weather_data || [];
-      const todayWeather = getWeatherForDay(weatherData, Math.floor(newGameData.month), newGameData.day_num);
-
-      if (todayWeather) {
-        newGameData.weather.current_temp = todayWeather.temp;
-        newGameData.weather.current_weather = todayWeather.weatherType;
-      }
-
-      // Handle active effects expiration
-      if (!newGameData.active_effects) {
-        newGameData.active_effects = {};
-      }
-
-      // Clear sold locations from previous day
-      newGameData.active_effects.sold_locations_today = [];
-
-      // Countdown ad campaign
-      if (newGameData.active_effects.ad_campaign_active) {
-        newGameData.active_effects.ad_campaign_days_left--;
-        if (newGameData.active_effects.ad_campaign_days_left <= 0) {
-          newGameData.active_effects.ad_campaign_active = false;
-          newGameData.active_effects.ad_campaign_days_left = 0;
-        }
-      }
-
-      // Reset second location uses on Monday (start of week)
-      if (newGameData.day_name === 'Monday') {
-        newGameData.active_effects.second_location_uses_this_week = 0;
-      }
-
-      // Remove batches older than 3 days (lemonade goes bad)
-      const MAX_BATCH_AGE = 3;
-      if (newGameData.inventory?.lemonade_batches) {
-        const beforeCount = newGameData.inventory.lemonade_batches.length;
-        newGameData.inventory.lemonade_batches = newGameData.inventory.lemonade_batches.filter(batch => {
-          const batchAge = newGameData.day_count - batch.created_on_day;
-          return batchAge < MAX_BATCH_AGE;
-        });
-        const removedCount = beforeCount - newGameData.inventory.lemonade_batches.length;
-        if (removedCount > 0) {
-          console.log(`Removed ${removedCount} expired lemonade batch(es)`);
-        }
-      }
-
-      // Remove cider batches older than 3 days
-      if (newGameData.inventory?.cider_batches) {
-        const beforeCount = newGameData.inventory.cider_batches.length;
-        newGameData.inventory.cider_batches = newGameData.inventory.cider_batches.filter(batch => {
-          const batchAge = newGameData.day_count - batch.created_on_day;
-          return batchAge < MAX_BATCH_AGE;
-        });
-        const removedCount = beforeCount - newGameData.inventory.cider_batches.length;
-        if (removedCount > 0) {
-          console.log(`Removed ${removedCount} expired cider batch(es)`);
-        }
-      }
-
-      // Update game
-      await updateGame(gameData.game_id, newGameData);
-      await loadGame();
-    } catch (error) {
-      console.error('Failed to advance day:', error);
-      alert('Failed to advance day. Please try again.');
-    } finally {
-      setAdvancing(false);
-    }
-  };
-
   if (loading) {
     return (
       <div className="home-office-container">
@@ -494,18 +376,11 @@ function HomeOffice() {
           📍 Choose Location
         </button>
         <button
-          onClick={handleAdvanceDay}
-          disabled={advancing}
-          className="btn-action advance-day-btn"
-        >
-          ⏭️ {advancing ? 'Advancing...' : 'Advance Day'}
-        </button>
-        <button
           onClick={handleShutdownWeek}
           disabled={advancing}
           className="btn-action shutdown-week-btn"
         >
-          💤 {advancing ? 'Processing...' : 'Shutdown ($5/day)'}
+          💤 {advancing ? 'Processing...' : 'Shutdown ($2/day)'}
         </button>
         <button onClick={() => navigate('/leaderboard')} className="btn-action leaderboard-btn">
           🏆 Leaderboard
