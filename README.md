@@ -103,10 +103,10 @@ You'll need to run both the backend and frontend servers simultaneously.
 
 ```bash
 cd lemonade-backend
-rails server
+rails server -p 3001
 ```
 
-The Rails API will run on `http://localhost:3000`
+The Rails API will run on `http://localhost:3001`
 
 ### Start the Frontend Server
 
@@ -117,7 +117,55 @@ cd lemonade-frontend
 npm start
 ```
 
-The React app will run on `http://localhost:3001` and automatically open in your browser.
+The React app will run on `http://localhost:3000` and automatically open in your browser.
+
+**Note**: Backend runs on port 3001, Frontend runs on port 3000.
+
+## 🔄 Git Workflow for Development
+
+### Working on Features Locally
+
+1. **Make sure you're on the main branch and it's up to date**
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+
+2. **Create a feature branch** (optional but recommended)
+   ```bash
+   git checkout -b feature/your-feature-name
+   # Example: git checkout -b feature/add-weather-effects
+   ```
+
+3. **Make your changes** and test locally
+
+4. **Check what changed**
+   ```bash
+   git status
+   git diff
+   ```
+
+5. **Commit your changes**
+   ```bash
+   git add .
+   git commit -m "Descriptive message about what you changed"
+   ```
+
+6. **Push to GitHub**
+   ```bash
+   git push origin feature/your-feature-name
+   # Or if working directly on main: git push origin main
+   ```
+
+### When Ready to Deploy to Production
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment instructions to Render.com.
+
+**Quick checklist before deploying:**
+1. All changes committed and pushed to GitHub
+2. Update `lemonade-frontend/public/config.js` to point to production backend URL
+3. Verify CORS settings will allow your production frontend domain
+4. Test thoroughly on localhost first
 
 ## 🎯 Game Overview
 

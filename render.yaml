@@ -32,7 +32,7 @@ services:
       - key: RAILS_SERVE_STATIC_FILES
         value: true
       - key: CORS_ORIGINS
-        value: https://lemonade-frontend.onrender.com  # Update if your frontend URL is different
+        value: https://lemonade-frontend.onrender.com  # Update with your actual frontend URL after first deploy
 
   # React Frontend
   - type: web
