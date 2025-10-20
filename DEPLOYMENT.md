@@ -140,10 +140,27 @@ View logs in Render Dashboard:
 - Check `DATABASE_URL` is connected to the database
 - View logs for specific error messages
 
-### Frontend can't connect to backend
-- Verify `REACT_APP_API_URL` points to correct backend URL
+### Frontend can't connect to backend ("Network error - please check your connection")
+
+**Most Common Issue**: The frontend was built with the wrong API URL.
+
+The frontend uses a **runtime configuration** file that must be set correctly:
+
+1. **Check the config file**: `lemonade-frontend/public/config.js` should contain:
+   ```javascript
+   window.ENV = {
+     REACT_APP_API_URL: 'https://lemonade-backend.onrender.com/api'
+   };
+   ```
+2. **Update the URL** if your backend URL is different
+3. **Rebuild and redeploy** the frontend after making changes
+4. **Clear browser cache** or test in incognito mode
+
+Other checks:
+- Verify `REACT_APP_API_URL` points to correct backend URL (without trailing slash)
 - Check CORS settings in backend allow frontend domain
 - Check backend is running and responding
+- Check browser console for the actual URL being called
 
 ### CORS errors
 - Update `CORS_ORIGINS` environment variable in backend

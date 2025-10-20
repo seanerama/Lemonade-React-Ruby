@@ -31,6 +31,8 @@ services:
         value: true
       - key: RAILS_SERVE_STATIC_FILES
         value: true
+      - key: CORS_ORIGINS
+        value: https://lemonade-frontend.onrender.com  # Update if your frontend URL is different
 
   # React Frontend
   - type: web
@@ -47,14 +49,13 @@ services:
         name: Cache-Control
         value: public, max-age=31536000, immutable
     envVars:
-      - key: REACT_APP_API_URL
-        value: https://lemonade-backend.onrender.com/api  # Update after backend deploys
       - key: NODE_VERSION
         value: 18  # Specify Node version
 
 # Notes:
-# 1. After first deploy, update REACT_APP_API_URL with your actual backend URL
-# 2. Add RAILS_MASTER_KEY manually in Render Dashboard (don't commit this file!)
-# 3. Free tier services spin down after 15 minutes of inactivity
-# 4. First request after spin-down takes 30-60 seconds
-# 5. Consider upgrading to paid plans for production use
+# 1. The frontend uses runtime config from public/config.js for the API URL
+# 2. Update public/config.js if your backend URL changes
+# 3. Add RAILS_MASTER_KEY manually in Render Dashboard (don't commit this file!)
+# 4. Free tier services spin down after 15 minutes of inactivity
+# 5. First request after spin-down takes 30-60 seconds
+# 6. Consider upgrading to paid plans for production use
