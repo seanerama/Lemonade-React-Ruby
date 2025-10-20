@@ -2,13 +2,30 @@
 
 This guide walks you through deploying the Lemonade Game (Rails API + React frontend) to Render.com.
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Architecture Overview](#architecture-overview)
+- [Method 1: Blueprint Deployment (Recommended)](#method-1-blueprint-deployment-recommended)
+- [Method 2: Manual Deployment](#method-2-manual-deployment)
+- [Post-Deployment Configuration](#post-deployment-configuration)
+- [Troubleshooting](#troubleshooting)
+- [Updating After Changes](#updating-after-changes)
+- [Monitoring](#monitoring)
+- [Cost Optimization](#cost-optimization)
+
+---
+
 ## Prerequisites
 
-- GitHub account with repository: `seanerama/Lemonade-React-Ruby`
+- GitHub account with your repository
 - Render.com account (free tier works)
 - Your `lemonade-backend/config/master.key` file (needed for Rails credentials)
+- Code pushed to GitHub on the `main` branch
 
-## Architecture
+---
+
+## Architecture Overview
 
 The app deploys as 3 Render services:
 1. **PostgreSQL Database** - Managed database service
@@ -17,261 +34,471 @@ The app deploys as 3 Render services:
 
 ---
 
-## Step 1: Push to GitHub
+# Method 1: Blueprint Deployment (Recommended)
 
-From the project root directory:
+This method uses the `render.yaml` file to automatically create all services at once.
+
+## Step 1: Prepare Your Code
+
+Ensure your code is pushed to GitHub:
 
 ```bash
-git init
 git add .
-git commit -m "Initial commit - ready for Render deployment"
-git branch -M main
-git remote add origin https://github.com/seanerama/Lemonade-React-Ruby.git
-git push -u origin main
+git commit -m "Prepare for Render deployment"
+git push origin main
 ```
 
----
+## Step 2: Update Frontend Configuration
 
-## Step 2: Deploy Using Render Blueprint
+Before deploying, update the frontend to point to your production backend:
 
-### Option A: One-Click Deploy (Recommended)
+1. Edit `lemonade-frontend/public/config.js`:
+   ```javascript
+   window.ENV = {
+     REACT_APP_API_URL: 'https://lemonade-backend.onrender.com/api'
+   };
+   ```
+
+2. Commit and push:
+   ```bash
+   git add lemonade-frontend/public/config.js
+   git commit -m "Configure for production deployment"
+   git push
+   ```
+
+## Step 3: Deploy via Blueprint
 
 1. Go to [Render Dashboard](https://dashboard.render.com)
 2. Click **"New +"** → **"Blueprint"**
-3. Connect your GitHub repository: `seanerama/Lemonade-React-Ruby`
-4. Render will detect `render.yaml` and create all services automatically
-5. **IMPORTANT**: Before clicking "Apply", you'll need to:
-   - Set `RAILS_MASTER_KEY` environment variable for the backend
-   - Update `REACT_APP_API_URL` with your backend URL (see step 3)
+3. Connect your GitHub repository
+4. Render will detect `render.yaml` and show all services to be created
+5. Click **"Apply"**
 
-### Option B: Manual Setup
+Render will now create:
+- PostgreSQL database
+- Backend web service
+- Frontend static site
 
-If you prefer manual setup, see the detailed instructions below.
+## Step 4: Configure Backend Environment Variable
 
----
+**IMPORTANT**: The backend won't start without the Rails master key.
 
-## Step 3: Configure Environment Variables
-
-After deployment starts, configure these:
-
-### Backend (lemonade-backend)
-
-1. Go to the backend service in Render Dashboard
-2. Go to **Environment** tab
+1. While services are deploying, go to the backend service
+2. Click **"Environment"** tab
 3. Add `RAILS_MASTER_KEY`:
    ```bash
    # On your local machine, get the master key:
    cat lemonade-backend/config/master.key
    ```
-   Copy the output and add it as `RAILS_MASTER_KEY` in Render
+4. Copy the output and add it as `RAILS_MASTER_KEY` in Render
+5. Save - the backend will automatically redeploy
 
-4. Add `CORS_ORIGINS` (after frontend deploys):
+## Step 5: Update CORS Configuration
+
+After both services are deployed, note your actual frontend URL (it may have a suffix like `-4zsp`).
+
+1. Go to backend service → **Environment** tab
+2. Find `CORS_ORIGINS` variable
+3. Update it to your actual frontend URL:
    ```
+   CORS_ORIGINS=https://lemonade-frontend-XXXX.onrender.com
+   ```
+   (Replace `XXXX` with your actual URL suffix)
+4. Save - backend will redeploy
+
+## Step 6: Update Frontend API URL (if needed)
+
+If your backend URL has a suffix, update the frontend:
+
+1. Edit `lemonade-frontend/public/config.js`:
+   ```javascript
+   window.ENV = {
+     REACT_APP_API_URL: 'https://lemonade-backend-XXXX.onrender.com/api'
+   };
+   ```
+2. Commit and push - frontend will auto-redeploy
+
+## Step 7: Verify Deployment
+
+**Check Backend:**
+Visit: `https://your-backend.onrender.com/api/leaderboard`
+- You should see JSON response (empty array is fine)
+
+**Check Frontend:**
+Visit: `https://your-frontend.onrender.com`
+- You should see the game interface
+- Try registering and logging in
+
+✅ **Deployment Complete!**
+
+---
+
+# Method 2: Manual Deployment
+
+If you prefer to create each service manually instead of using the Blueprint.
+
+## Step 1: Prepare Your Code
+
+Ensure your code is pushed to GitHub:
+
+```bash
+git add .
+git commit -m "Prepare for Render deployment"
+git push origin main
+```
+
+## Step 2: Update Frontend Configuration
+
+Edit `lemonade-frontend/public/config.js`:
+```javascript
+window.ENV = {
+  REACT_APP_API_URL: 'https://lemonade-backend.onrender.com/api'
+};
+```
+
+Commit and push:
+```bash
+git add lemonade-frontend/public/config.js
+git commit -m "Configure for production deployment"
+git push
+```
+
+## Step 3: Create PostgreSQL Database
+
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click **New +** → **PostgreSQL**
+3. Configure:
+   - **Name**: `lemonade-db`
+   - **Database**: `lemonade_production`
+   - **User**: `lemonade_user`
+   - **Region**: `Ohio` (or your preference)
+   - **Plan**: `Free`
+4. Click **Create Database**
+5. **Copy the Internal Database URL** (you'll need this for the backend)
+
+## Step 4: Create Backend Service
+
+1. Click **New +** → **Web Service**
+2. Connect your GitHub repository
+3. Configure:
+   - **Name**: `lemonade-backend`
+   - **Root Directory**: `lemonade-backend`
+   - **Environment**: `Docker`
+   - **Region**: `Ohio` (match database region)
+   - **Branch**: `main`
+   - **Dockerfile Path**: `./Dockerfile`
+   - **Plan**: `Free`
+
+4. Click **Advanced** and add environment variables:
+   ```
+   RAILS_ENV=production
+   DATABASE_URL=<paste-your-internal-database-url>
+   RAILS_MASTER_KEY=<paste-from-local-file>
+   RAILS_LOG_TO_STDOUT=true
+   RAILS_SERVE_STATIC_FILES=true
    CORS_ORIGINS=https://lemonade-frontend.onrender.com
    ```
-   (Replace with your actual frontend URL)
 
-### Frontend (lemonade-frontend)
+5. Set **Health Check Path**: `/api/leaderboard`
 
-1. Go to the frontend service in Render Dashboard
-2. Go to **Environment** tab
-3. Update `REACT_APP_API_URL`:
+6. Click **Create Web Service**
+
+## Step 5: Create Frontend Service
+
+1. Click **New +** → **Static Site**
+2. Connect your GitHub repository
+3. Configure:
+   - **Name**: `lemonade-frontend`
+   - **Root Directory**: `lemonade-frontend`
+   - **Build Command**: `npm ci && npm run build`
+   - **Publish Directory**: `build`
+   - **Branch**: `main`
+   - **Plan**: `Free`
+
+4. Click **Advanced** and add environment variable:
    ```
-   REACT_APP_API_URL=https://lemonade-backend.onrender.com/api
+   NODE_VERSION=18
    ```
-   (Replace with your actual backend URL)
 
-4. **Trigger Redeploy** after changing this variable (Manual Deploy → Deploy Latest Commit)
+5. Click **Create Static Site**
+
+## Step 6: Update CORS After Frontend Deploys
+
+Once the frontend finishes deploying, note its actual URL.
+
+1. Go to backend service → **Environment** tab
+2. Update `CORS_ORIGINS` to your actual frontend URL:
+   ```
+   CORS_ORIGINS=https://lemonade-frontend-XXXX.onrender.com
+   ```
+3. Save - backend will redeploy
+
+## Step 7: Update Frontend API URL (if needed)
+
+If your backend URL has a suffix, update the frontend:
+
+1. Edit `lemonade-frontend/public/config.js`:
+   ```javascript
+   window.ENV = {
+     REACT_APP_API_URL: 'https://lemonade-backend-XXXX.onrender.com/api'
+   };
+   ```
+2. Commit and push - frontend will auto-redeploy
+
+## Step 8: Verify Deployment
+
+**Check Backend:**
+Visit: `https://your-backend.onrender.com/api/leaderboard`
+- You should see JSON response
+
+**Check Frontend:**
+Visit: `https://your-frontend.onrender.com`
+- Try registering and logging in
+
+✅ **Deployment Complete!**
 
 ---
 
-## Step 4: Verify Deployment
+# Post-Deployment Configuration
 
-### Check Backend
+## Important URLs
 
-Visit: `https://lemonade-backend.onrender.com/api/leaderboard`
+After deployment, note these URLs:
+- **Backend**: `https://lemonade-backend-XXXX.onrender.com`
+- **Frontend**: `https://lemonade-frontend-XXXX.onrender.com`
+- **Database**: Internal URL (auto-configured)
 
-You should see JSON response (empty array is fine).
-
-### Check Frontend
-
-Visit: `https://lemonade-frontend.onrender.com`
-
-You should see the Lemonade Game interface.
-
----
-
-## Important Notes
-
-### Free Tier Limitations
+## Free Tier Limitations
 
 - Services **spin down after 15 minutes** of inactivity
 - First request after spin-down takes **30-60 seconds** to wake up
 - Database has **1GB storage limit**
 - **750 hours/month** total across all services
 
-### URLs to Update
-
-After deployment, you'll have these URLs:
-- Backend: `https://lemonade-backend.onrender.com`
-- Frontend: `https://lemonade-frontend.onrender.com`
-- Database: Internal URL (auto-configured)
-
-Make sure to update:
-1. `CORS_ORIGINS` in backend environment variables
-2. `REACT_APP_API_URL` in frontend environment variables
-
-### Database Migrations
+## Database Migrations
 
 Database migrations run **automatically** on backend startup via the Docker entrypoint script.
 
-### Logs
+## Viewing Logs
 
-View logs in Render Dashboard:
-- Backend: Click on service → "Logs" tab
-- Frontend: Build logs available during deployment
+In Render Dashboard:
+- **Backend**: Click on service → "Logs" tab
+- **Frontend**: Click on service → "Logs" tab (shows build logs)
 
 ---
 
-## Troubleshooting
+# Troubleshooting
 
-### Backend won't start
-- Check `RAILS_MASTER_KEY` is set correctly
+## Backend Won't Start
+
+**Symptoms**: Backend service shows errors, never goes green
+
+**Solutions**:
+- Check `RAILS_MASTER_KEY` is set correctly (no extra spaces)
 - Check `DATABASE_URL` is connected to the database
 - View logs for specific error messages
+- Ensure database is in the same region as backend
 
-### Frontend can't connect to backend ("Network error - please check your connection")
+## Frontend Can't Connect to Backend
+
+**Error**: "Network error - please check your connection"
 
 **Most Common Issue**: The frontend was built with the wrong API URL.
 
-The frontend uses a **runtime configuration** file that must be set correctly:
+**Solutions**:
 
 1. **Check the config file**: `lemonade-frontend/public/config.js` should contain:
    ```javascript
    window.ENV = {
-     REACT_APP_API_URL: 'https://lemonade-backend.onrender.com/api'
+     REACT_APP_API_URL: 'https://lemonade-backend-XXXX.onrender.com/api'
    };
    ```
 2. **Update the URL** if your backend URL is different
-3. **Rebuild and redeploy** the frontend after making changes
+3. **Commit and push** to trigger a rebuild
 4. **Clear browser cache** or test in incognito mode
 
 Other checks:
-- Verify `REACT_APP_API_URL` points to correct backend URL (without trailing slash)
+- Verify backend URL has no trailing slash
 - Check CORS settings in backend allow frontend domain
-- Check backend is running and responding
+- Check backend is running (visit `/api/leaderboard`)
 - Check browser console for the actual URL being called
 
-### CORS errors
+## CORS Errors
+
+**Error**: "Access to XMLHttpRequest has been blocked by CORS policy"
+
+**Solutions**:
 - Update `CORS_ORIGINS` environment variable in backend
-- Must include frontend URL without trailing slash
-- Restart backend after changing CORS settings
+- Must include frontend URL **without** trailing slash
+- Correct: `https://lemonade-frontend-4zsp.onrender.com`
+- Wrong: `https://lemonade-frontend-4zsp.onrender.com/`
+- Save and wait for backend to redeploy
 
-### Database connection issues
+## Database Connection Issues
+
+**Symptoms**: Backend crashes with database errors
+
+**Solutions**:
 - Ensure backend and database are in the **same region**
-- Check `DATABASE_URL` is properly connected in backend environment
+- Check `DATABASE_URL` is properly set in backend environment
+- Check database service is running and healthy
+
+## First Load is Very Slow
+
+**Why**: Free tier services spin down after 15 minutes of inactivity
+
+**Solutions**:
+- Wait 30-60 seconds for services to wake up
+- Upgrade to paid plans ($7/month each) to prevent spin-down
+- Consider using a service like UptimeRobot to ping your app regularly
 
 ---
 
-## Manual Deployment Steps (Alternative to Blueprint)
+# Updating After Changes
 
-If you prefer to set up services manually instead of using `render.yaml`:
+## Automatic Deployment
 
-### 1. Create PostgreSQL Database
+Render automatically redeploys when you push to the `main` branch.
 
-1. Dashboard → New + → PostgreSQL
-2. Configure:
-   - Name: `lemonade-db`
-   - Database: `lemonade_production`
-   - User: `lemonade_user`
-   - Region: `Ohio` (or your preference)
-   - Plan: `Free`
-3. Create Database
-4. **Copy the Internal Database URL** (needed for backend)
-
-### 2. Create Backend Service
-
-1. Dashboard → New + → Web Service
-2. Connect GitHub repo: `seanerama/Lemonade-React-Ruby`
-3. Configure:
-   - Name: `lemonade-backend`
-   - Root Directory: `lemonade-backend`
-   - Environment: `Docker`
-   - Region: `Ohio` (match database)
-   - Branch: `main`
-   - Dockerfile Path: `lemonade-backend/Dockerfile`
-4. Add Environment Variables:
-   ```
-   RAILS_ENV=production
-   DATABASE_URL=<paste-internal-database-url>
-   RAILS_MASTER_KEY=<from-local-file>
-   RAILS_LOG_TO_STDOUT=true
-   CORS_ORIGINS=https://lemonade-frontend.onrender.com
-   ```
-5. Advanced: Set Health Check Path: `/api/leaderboard`
-6. Create Web Service
-
-### 3. Create Frontend Service
-
-1. Dashboard → New + → Static Site
-2. Connect GitHub repo: `seanerama/Lemonade-React-Ruby`
-3. Configure:
-   - Name: `lemonade-frontend`
-   - Root Directory: `lemonade-frontend`
-   - Build Command: `npm ci && npm run build`
-   - Publish Directory: `build`
-   - Branch: `main`
-4. Add Environment Variables:
-   ```
-   REACT_APP_API_URL=https://lemonade-backend.onrender.com/api
-   NODE_VERSION=18
-   ```
-5. Create Static Site
-
----
-
-## Updating After Changes
-
-### Backend Changes
 ```bash
 git add .
-git commit -m "Backend updates"
-git push
+git commit -m "Your changes"
+git push origin main
 ```
-Render auto-deploys on push to `main` branch.
 
-### Frontend Changes
+Both backend and frontend will automatically rebuild and redeploy.
+
+## Manual Deployment
+
+If auto-deploy is disabled or you want to force a redeploy:
+
+1. Go to the service in Render Dashboard
+2. Click **"Manual Deploy"** → **"Deploy latest commit"**
+
+## Reverting to a Previous Version
+
+1. Go to the service in Render Dashboard
+2. Click **"Events"** tab
+3. Find the successful deployment you want to revert to
+4. Click **"Rollback to this version"**
+
+---
+
+# Monitoring
+
+## Render Dashboard
+
+Access at: https://dashboard.render.com
+
+**Available Metrics**:
+- CPU usage
+- Memory usage
+- Bandwidth usage
+- Request counts
+- Error rates
+
+## Logs
+
+Real-time logs available for each service:
+1. Click on the service
+2. Click **"Logs"** tab
+3. Use filters to search logs
+
+## Alerts
+
+Configure email alerts:
+1. Go to service settings
+2. Enable notifications for:
+   - Deploy failures
+   - Service crashes
+   - High resource usage
+
+---
+
+# Cost Optimization
+
+## Free Tier (Current)
+
+**Pros**:
+- $0/month
+- Great for development and testing
+- Full feature access
+
+**Cons**:
+- Services spin down after 15 minutes
+- Slow wake-up time (30-60 seconds)
+- 1GB database storage limit
+- 750 hours/month across all services
+
+## Production Tier (Recommended for Live)
+
+**Database**: Starter plan - $7/month
+- 10GB storage
+- No sleep/spin-down
+- Better performance
+
+**Backend**: Starter plan - $7/month
+- No sleep/spin-down
+- Better CPU/memory
+- Faster response times
+
+**Frontend**: Free tier - $0/month
+- Static sites don't spin down
+- Free tier is perfect
+
+**Total Production Cost**: ~$14/month
+
+## When to Upgrade
+
+Upgrade when you:
+- Have regular users
+- Need consistent response times
+- Can't tolerate 30-60 second wake-up delays
+- Need more than 1GB database storage
+
+---
+
+# Support
+
+- **Render Docs**: https://render.com/docs
+- **GitHub Issues**: Create an issue in your repository
+- **Render Support**: Available via dashboard chat
+
+---
+
+# Quick Reference
+
+## Important Files
+
+- `render.yaml` - Blueprint configuration
+- `lemonade-frontend/public/config.js` - Frontend API URL
+- `lemonade-backend/config/master.key` - Rails encryption key (keep secret!)
+- `lemonade-backend/config/initializers/cors.rb` - CORS configuration
+
+## Common Commands
+
 ```bash
+# Get Rails master key
+cat lemonade-backend/config/master.key
+
+# Push changes to deploy
 git add .
-git commit -m "Frontend updates"
-git push
+git commit -m "Your message"
+git push origin main
+
+# Test backend locally
+cd lemonade-backend
+rails server -p 3001
+
+# Test frontend locally
+cd lemonade-frontend
+npm start
 ```
-Render auto-deploys and rebuilds static assets.
 
----
+## Service URLs
 
-## Monitoring
+Replace `XXXX` with your actual URL suffix:
 
-- **Dashboard**: https://dashboard.render.com
-- **Metrics**: Each service has CPU, Memory, Bandwidth graphs
-- **Logs**: Real-time logs available in each service
-- **Alerts**: Configure email alerts for service failures
-
----
-
-## Cost Optimization
-
-Free tier is fine for development, but for production consider:
-
-- **Database**: Starter plan ($7/mo) - 10GB storage, no sleep
-- **Backend**: Starter plan ($7/mo) - No sleep, better performance
-- **Frontend**: Free tier is fine (static sites don't sleep)
-
-**Estimated production cost**: ~$14/month
-
----
-
-## Support
-
-- Render Docs: https://render.com/docs
-- GitHub Issues: https://github.com/seanerama/Lemonade-React-Ruby/issues
+- Backend API: `https://lemonade-backend-XXXX.onrender.com/api`
+- Frontend: `https://lemonade-frontend-XXXX.onrender.com`
+- Backend Health: `https://lemonade-backend-XXXX.onrender.com/api/leaderboard`
