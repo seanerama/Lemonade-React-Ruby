@@ -7,5 +7,5 @@
 // Production example: 'https://lemonade-backend.onrender.com/api'
 
 window.ENV = {
-  REACT_APP_API_URL: 'https://lemonade-backend.onrender.com/api'  // Uncomment for production
+  REACT_APP_API_URL: 'https://lemonade-backend-r13p.onrender.com/api'  // Production backend URL
 };
