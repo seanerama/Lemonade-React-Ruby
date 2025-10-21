@@ -1,12 +1,8 @@
 # Render Blueprint for Lemonade Game
 # This file defines all the infrastructure needed to deploy the app
 
-databases:
-  - name: lemonade-db
-    databaseName: lemonade_production
-    user: lemonade_user
-    plan: free  # Change to 'starter' for production ($7/month)
-    region: ohio  # Change to your preferred region
+# Database is shared with US States Game project (states-game-db)
+# Using existing PostgreSQL server with lemonade_production database
 
 services:
   # Rails API Backend
@@ -22,9 +18,7 @@ services:
       - key: RAILS_ENV
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: lemonade-db
-          property: connectionString
+        value: postgresql://states_game_db_user:zw6nGBmMvbrAAwOfMXBfT3ykWmxwzB56@dpg-d3qgn5vdiees73ac4q8g-a.oregon-postgres.render.com/lemonade_production
       - key: RAILS_MASTER_KEY
         sync: false  # Add this manually in Render Dashboard (from lemonade-backend/config/master.key)
       - key: RAILS_LOG_TO_STDOUT
